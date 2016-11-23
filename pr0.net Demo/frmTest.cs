@@ -19,18 +19,18 @@ namespace pr0.net_Demo
             InitializeComponent();            
         }
 
-        private void PostLine(string line)
+        private void PostLine(string format, params object[] args)
         {
-            metroTextBox1.Text = line + "\r\n" + metroTextBox1.Text;
+            metroTextBox1.Text = string.Format(format,args) + "\r\n" + metroTextBox1.Text;
         }
 
         private void metroButton1_Click(object sender, EventArgs e)
         {
             //try
             //{
-                p.Login(txbUsername.Text, txbPassword.Text);
-                PostLine("Login successfull!");
-                PostLine("ID: " + p.Session.Id);
+            //p.Login(txbUsername.Text, txbPassword.Text);
+            //PostLine("Login successfull!");
+            //PostLine("ID: " + p.Session.Id);
             //}
             //catch (Exception ex)
             //{

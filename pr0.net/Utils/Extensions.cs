@@ -37,5 +37,9 @@ namespace pr0.net.Utils
                 using (StreamReader reader = new StreamReader(mem, enc))
                     return (T)json.Deserialize(reader, typeof(T));
         }
+        public static double Benchmark(this Action ac)
+        {
+            return Utils.Benchmark.Action(ac);
+        }
     }
 }

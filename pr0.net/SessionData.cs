@@ -20,14 +20,20 @@ namespace pr0.net
         [JsonProperty(PropertyName = "id")]
         public string Id { get; private set; }
 
+        [JsonProperty(PropertyName = "n")]
+        public string Name { get; private set; }
+
         [JsonProperty(PropertyName = "a")]
-        public int A { get; private set; }
+        public int Admin { get; private set; }
 
         [JsonProperty(PropertyName = "pp")]
         public int PP { get; private set; }
 
         [JsonProperty(PropertyName = "paid")]
         public bool Paid { get; private set; }
+
+        [JsonIgnore]
+        public string Nonce { get { return Id.Substring(0, 16); } }
         #endregion
     }
 }
