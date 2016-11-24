@@ -18,6 +18,6 @@ namespace pr0.net.Feed
         public string Error { get; private set; }
 
         [JsonProperty(PropertyName = "items")]
-        public List<FeedItem> Items { get; private set; }
+        public List<FeedItemResponse> Items { get; private set; }
     }
 }

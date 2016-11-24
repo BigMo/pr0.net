@@ -16,8 +16,8 @@ namespace pr0.net.Feed
 
         #region PROPERTIES
         public FeedFlags Flags { get; set; }
-        public FeedItem OlderThan { get; set; }
-        public FeedItem NewerThan { get; set; }
+        public FeedItemResponse OlderThan { get; set; }
+        public FeedItemResponse NewerThan { get; set; }
         public string ByUser { get; set; }
         public string Tags { get; set; }
         public bool PromotedOnly { get; set; }
@@ -41,6 +41,13 @@ namespace pr0.net.Feed
 
                 return newer;
             }
+        }
+        #endregion
+
+        #region CONSTRUCTORS
+        public FeedRequest()
+        {
+            Flags = FeedFlags.SFW;
         }
         #endregion
 
@@ -77,12 +84,12 @@ namespace pr0.net.Feed
                 this.Make.Flags = value;
                 return this;
             }
-            public Builder OlderThan(FeedItem value)
+            public Builder OlderThan(FeedItemResponse value)
             {
                 this.Make.OlderThan = value;
                 return this;
             }
-            public Builder NewerThan(FeedItem value)
+            public Builder NewerThan(FeedItemResponse value)
             {
                 this.Make.NewerThan = value;
                 return this;

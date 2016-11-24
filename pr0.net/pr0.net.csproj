@@ -54,10 +54,15 @@
   <ItemGroup>
     <Compile Include="BaseResponse.cs" />
     <Compile Include="BasicComment.cs" />
+    <Compile Include="Caching\FileCache.cs" />
+    <Compile Include="Caching\MediaData.cs" />
+    <Compile Include="Caching\MediaPresentation.cs" />
+    <Compile Include="Caching\MediaType.cs" />
     <Compile Include="ErrorHandling\ErrorException.cs" />
     <Compile Include="ErrorHandling\ErrorResponse.cs" />
     <Compile Include="Feed\FeedFlags.cs" />
     <Compile Include="Feed\FeedItem.cs" />
+    <Compile Include="Feed\FeedItemResponse.cs" />
     <Compile Include="Feed\FeedResponse.cs" />
     <Compile Include="Login\LoginFailedResponse.cs" />
     <Compile Include="SessionData.cs" />
@@ -77,6 +82,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

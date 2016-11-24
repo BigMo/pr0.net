@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using pr0.net.Utils;
+﻿using pr0.net.Caching;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace pr0.net.Feed
@@ -11,60 +12,59 @@ namespace pr0.net.Feed
     public class FeedItem
     {
         #region PROPERTIES
-        [JsonProperty(PropertyName = "id")]
-        public int Id { get; private set; }
-
-        [JsonConverter(typeof(BoolConverter))]
-        [JsonProperty(PropertyName = "promoted")]
-        public bool Promoted { get; private set; }
-
-        [JsonProperty(PropertyName = "up")]
-        public int UpVotes { get; private set; }
-
-        [JsonProperty(PropertyName = "down")]
-        public int DownVotes { get; private set; }
-
-        [JsonProperty(PropertyName = "created")]
-        [JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime Created { get; private set; }
-
-        [JsonProperty(PropertyName = "image")]
-        public string Image { get; private set; }
-
-        [JsonProperty(PropertyName = "Thumb")]
-        public string Thumb { get; private set; }
-
-        [JsonProperty(PropertyName = "Fullsize")]
-        public string Fullsize { get; private set; }
-
-        [JsonProperty(PropertyName = "width")]
-        public int Width { get; private set; }
-
-        [JsonProperty(PropertyName = "height")]
-        public int Height { get; private set; }
-
-        [JsonConverter(typeof(BoolConverter))]
-        public bool Audio { get; private set; }
-
-        [JsonProperty(PropertyName = "source")]
-        public string Source { get; private set; }
-
-        [JsonProperty(PropertyName = "flags")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public FeedFlags Flags { get; private set; }
-
-        [JsonProperty(PropertyName = "user")]
-        public string User { get; private set; }
-
-        [JsonConverter(typeof(BoolConverter))]
-        [JsonProperty(PropertyName = "mark")]
-        public bool Mark { get; private set; }
+        public FeedItemResponse Response { get; private set; }
+        public Lazy<MediaData> Thumb { get; private set; }
+        public Lazy<MediaData> Image { get; private set; }
+        public Lazy<MediaData> Fullsize { get; private set; }
+        public MediaType Type
+        {
+            get
+            {
+                return Image.IsValueCreated ? Image.Value.Type :
+                    (Response.Image.EndsWith(".webm") || Response.Image.EndsWith(".mp4") ? MediaType.Video : MediaType.Image);
+            }
+        }
         #endregion
 
         #region CONSTRUCTORS
-        public FeedItem()
+        public FeedItem(FileCache cache, FeedItemResponse response)
         {
+            Response = response;
 
+            Thumb = new Lazy<MediaData>(() => cache[MediaPresentation.Thumb].Any(x=>x.Id == response.Id) ?
+                cache[MediaPresentation.Thumb].First(x => x.Id == response.Id) :
+                DownloadMedia(cache, MediaType.Image, MediaPresentation.Thumb, response.Thumb));
+
+            Image = new Lazy<MediaData>(() => cache[MediaPresentation.Image].Any(x => x.Id == response.Id) ?
+                cache[MediaPresentation.Image].First(x => x.Id == response.Id) :
+                DownloadMedia(cache, Type, MediaPresentation.Image, response.Image));
+
+            Fullsize = new Lazy<MediaData>(() => cache[MediaPresentation.Fullsize].Any(x => x.Id == response.Id) ?
+                cache[MediaPresentation.Fullsize].First(x => x.Id == response.Id) :
+                DownloadMedia(cache, MediaType.Image, MediaPresentation.Fullsize, response.Fullsize));
+        }
+        #endregion
+
+        #region METHODS
+        private MediaData DownloadMedia(FileCache cache, MediaType type, MediaPresentation pres, string mediaUrl)
+        {
+            string url = "http://" +
+                (pres == MediaPresentation.Image ?
+                    (type == MediaType.Image ? "img" : "vid") :
+                    pres == MediaPresentation.Thumb ? "thumb" : "full") +
+                ".pr0gramm.com/" + mediaUrl;
+            string path = cache.CraftPath(pres, this.Response.Id.ToString() + mediaUrl.Substring(mediaUrl.LastIndexOf('.')));
+
+            if (!File.Exists(path))
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadFile(url, path + ".tmp");
+                    File.Move(path + ".tmp", path);
+                }
+            }
+
+            return new MediaData(Response.Id, path, Type, pres);
         }
         #endregion
     }
